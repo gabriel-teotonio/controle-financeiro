@@ -6,7 +6,7 @@ const displayIncome = document.querySelector('#money-plus')
 const form = document.querySelector('form')
 const inputTransactionName = document.querySelector('#text')
 const inputTransactionAmount = document.querySelector('#amount')
-
+const transactionTypes = document.querySelectorAll('input[name="transaction-type"]');
 
 const localStorageTransactions = JSON.parse(localStorage
     .getItem('transactions'))
@@ -19,41 +19,39 @@ const removeTransaction = ID => {
     init()
 }
 
-const addTransactionsIntoDOM = ({ amount, name, id }) => {
-    const operator = amount < 0 ? '-': '+';
-    const CSSclass = amount < 0 ? 'minus': 'plus'; 
-    const amoutWithoutOperator = Math.abs(amount);
+const addTransactionsIntoDOM = ({ amount, name, id, transactionType }) => {
+    const CSSclass = transactionType === 'expense' ? 'minus': 'plus'; 
     const li = document.createElement('li')
 
     li.classList.add(CSSclass)
     li.innerHTML = `
-    ${name} <span>${operator} R$ ${amoutWithoutOperator}</span><button class="delete-btn"
+    ${name} <span> R$ ${amount}</span><button class="delete-btn"
      onClick="removeTransaction(${id})">x</button>
     `
     transactionsUl.prepend(li)
 }
 
-const getExpenses = transactionsAmounts => Math.abs(transactionsAmounts
-    .filter(value => value < 0)
+const getExpenses = expenseTransactions => (expenseTransactions
     .reduce((acc, value) => acc + value , 0))
     .toFixed(2)
 
 const getIncome = transactionsAmounts => transactionsAmounts
-    .filter(value => value > 0)
     .reduce((acc, value) => acc + value , 0)
     .toFixed(2)
 
-const getTotalAmount = transactionsAmounts => transactionsAmounts
-    .reduce((acc, transaction) => acc + transaction , 0)
-    .toFixed(2)
-
 const updateBalanceValues = () => {
-    const transactionsAmounts = transactions.map(({ amount }) => amount )
-    const totalAmount = getTotalAmount(transactionsAmounts)
-    const expense = getExpenses(transactionsAmounts)
-    const income = getIncome(transactionsAmounts)
+    const expenseTransactions = transactions
+    .filter(item => item.transactionType === 'expense')
+    .map(item => item.amount)
+
+    const incomeTransactions = transactions
+    .filter(item => item.transactionType === 'income')
+    .map(item => item.amount)
+
+    const expense = getExpenses(expenseTransactions)
+    const income = getIncome(incomeTransactions)
         
-    displayBalance.textContent = `R$ ${totalAmount}`;
+    displayBalance.textContent = `R$ ${income - expense}`;
     displayIncome.textContent = `R$ ${income}`;
     displayExpense.textContent = `R$ ${expense}`;
 }
@@ -72,11 +70,12 @@ const updateLocalStorage = () => {
 
 const idGenerator = () => Math.round(Math.random() * 100)
 
-const addToTransactionsArray = (transactionName,transactionAmount) => {
+const addToTransactionsArray = (transactionName,transactionAmount, transactionType) => {
     transactions.push({
         id: idGenerator(),
         name: transactionName, 
-        amount: Number(transactionAmount) 
+        amount: Number(transactionAmount),
+        transactionType
     })
 }
 
@@ -89,14 +88,22 @@ const handleFormSubmit = e => {
     e.preventDefault()
     const transactionName = inputTransactionName.value.trim()
     const transactionAmount = inputTransactionAmount.value.trim()
-    const isSomeInputEmpty = transactionAmount === '' || transactionName === ''
+    let selectedType = '';
+
+    transactionTypes.forEach(type => {
+        if(type.checked){
+            selectedType = type.value
+        }
+    })
+
+    const isSomeInputEmpty = transactionAmount === '' || transactionName === '' || selectedType === '';
     
     if(isSomeInputEmpty){
         alert('Por favor, preencha todos os campos')
         return
     }
 
-    addToTransactionsArray(transactionName, transactionAmount)
+    addToTransactionsArray(transactionName, transactionAmount, selectedType)
     init()
     updateLocalStorage()
     cleanInputs()
