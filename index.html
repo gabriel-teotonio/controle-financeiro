@@ -36,7 +36,7 @@
         <!-- -->
       </ul>
       </div>
-      <form id="form">
+      <form id="form" class="form-transaction">
         <h3 class="default-title_topic">Adicionar transação</h3>
         <div class="form-control">
           <label for="text">Nome</label>
@@ -46,7 +46,17 @@
           <label for="amount">Valor</label>
           <input type="number" id="amount" placeholder="Valor da transação" />
         </div>
-
+        <div class="form-control">
+          <label>Tipo de transação</label>
+          <div class="box-type_transaction">
+            <input type="radio" name="typeTransaction" id="income" value="income" />
+            <label for="income">Entrada</label>
+          </div>
+          <div class="box-type_transaction">
+            <input type="radio" name="typeTransaction" id="expense" value="expense" />
+            <label for="expense">Saída</label>
+          </div>
+        </div>
         <button class="btn">Adicionar</button>
       </form>
     </div>
