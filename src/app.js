@@ -110,3 +110,23 @@ const handleFormSubmit = e => {
 }
 
 form.addEventListener('submit', handleFormSubmit)
+
+
+// modal js
+const openModalBtn = document.getElementById('open-modal-btn');
+const modal = document.getElementById('modal');
+const closeBtn = document.querySelector('.close-btn');
+
+openModalBtn.addEventListener('click', function() {
+  modal.style.display = 'block';
+});
+
+closeBtn.addEventListener('click', function() {
+  modal.style.display = 'none';
+});
+
+window.addEventListener('click', function(event) {
+  if (event.target == modal) {
+    modal.style.display = 'none';
+  }
+});
